@@ -182,3 +182,26 @@ for i in range(1,M.shape[0]):
 W1=ponderacion(Ip_c1,In_c1,ND1)
 W2=ponderacion(Ip_c2,In_c2,ND2)
 print(W1.shape)
+
+Grafo=nx.Graph()
+
+vertices=[]
+for i in range(1,36):
+  vertices.append("v"+str(i))
+ Grafo.add_nodes_from(vertices)
+aristas=[]
+
+#aristas de componente 1
+for i in range(len(ind_c1)):
+  for j in range(i+1,len(ind_c1)):
+    if (i+1)!=len(ind_c1):
+      aristas.append(("v"+str(ind_c1[i]),"v"+str(ind_c1[j])))
+
+#aristas de componente 2
+for i in range(len(ind_c2)):
+  for j in range(i+1,len(ind_c2)):
+    if (i+1)!=len(ind_c2):
+      aristas.append(("v"+str(ind_c2[i]),"v"+str(ind_c2[j])))
+      
+#aristas de componente 3
+aristas.append(("v"+str(6),"v"+str(35)))
