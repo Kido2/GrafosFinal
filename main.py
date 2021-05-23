@@ -131,13 +131,13 @@ def ponderacion(I1,I2,D):
     #inputs: 
         #I1,I2->vectores I+ e I- de un componente
         #D-> matriz de distancia de un componente
-    #outpur:
+    #output:
         #W-> matriz de pesos (como es simetrica solo se calculan los valores por encima de la diagonal entonces es triangular superior)
     W=np.zeros((I1.shape[0],I1.shape[0]))
     for i in range(0,I1.shape[0]):
         for j in range(i+1,I1.shape[0]):
                 #computa el peso de la arista ij
-                p=(0.7)*((0.5)*(I1[i]+I1[j])+(0.5)*(I2[i]+I2[j]))-(0.3)*D[i,j]
+                p=(0.5)*((0.7)*(I1[i]+I1[j])-(0.3)*(I2[i]+I2[j]))-(0.5)*D[i,j]
                 if p>0:
                     W[i,j]=p
     
@@ -150,12 +150,12 @@ def ponderacion(I1,I2,D):
 #D2 la matriz de distancias del componente 2
 
 #indices de los parches que pertenecen a cada componente
-ind_c1=[1,2,3,4,5,7,8,9,10,11,12,13,14,15,16,17,18,19,30,31,32,34]
-ind_c2=[20,21,22,23,24,25,26,27,28,29,33]
+
 #partir M de dimension (35x8) en dos matrices M_p (35x5) y M_n (35x3)
 #M_p=M[:,:5]
 #M_n=M[:,5:]
 # Creacion del vector I+ y el vector I-
+# Area Relativa de cada zona,Vulnerabilidad de Cada Especie, Indice de dispersión, Cercania a cuerpos hidricos, Número de especies presente en cada zona
 fac_p=np.array([0.2,0.25,0.05,0.4,0.1])
 fac_n=np.array([0.3,0.4,0.3])
 #Ip=np.dot(M_p,fac_p)
@@ -167,41 +167,45 @@ In_c1=np.dot(cn1,fac_n)
 Ip_c2=np.dot(cp2,fac_p)
 In_c2=np.dot(cn2,fac_n)
 
-"""
-for i in range(1,M.shape[0]):
-    if (i in ind_c1) and (i!=1):
-        Ip_c1=np.concatenate((Ip_c1,np.array([Ip[i]])),axis=0)
-        In_c1=np.concatenate((In_c1,np.array([In[i]])),axis=0)
-    else:
-        if (i in ind_c2) and (i!=20):
-            Ip_c2=np.concatenate((Ip_c2,np.array([Ip[i]])),axis=0)
-            In_c2=np.concatenate((In_c2,np.array([In[i]])),axis=0)
-"""
 
 #se obtienen las matrices con los pesos de todas las aristas
 W1=ponderacion(Ip_c1,In_c1,ND1)
 W2=ponderacion(Ip_c2,In_c2,ND2)
-print(W1.shape)
+#print(W1.shape)
 
+ind_c1=[1,2,3,4,5,7,8,9,10,11,12,13,14,15,16,17,18,19,30,31,32,34]
+ind_c2=[20,21,22,23,24,25,26,27,28,29,33]
 Grafo=nx.Graph()
 
 vertices=[]
 for i in range(1,36):
   vertices.append("v"+str(i))
- Grafo.add_nodes_from(vertices)
+Grafo.add_nodes_from(vertices)
 aristas=[]
 
 #aristas de componente 1
 for i in range(len(ind_c1)):
   for j in range(i+1,len(ind_c1)):
     if (i+1)!=len(ind_c1):
-      aristas.append(("v"+str(ind_c1[i]),"v"+str(ind_c1[j])))
+      aristas.append(("v"+str(ind_c1[i]),"v"+str(ind_c1[j]),W1[i,j]))
 
 #aristas de componente 2
 for i in range(len(ind_c2)):
   for j in range(i+1,len(ind_c2)):
     if (i+1)!=len(ind_c2):
-      aristas.append(("v"+str(ind_c2[i]),"v"+str(ind_c2[j])))
+      aristas.append(("v"+str(ind_c2[i]),"v"+str(ind_c2[j]),W2[i,j]))
       
 #aristas de componente 3
-aristas.append(("v"+str(6),"v"+str(35)))
+aristas.append(("v"+str(6),"v"+str(35),0.7))
+#print(aristas)
+Grafo.add_weighted_edges_from(aristas)
+mst = nx.tree.maximum_spanning_edges(Grafo, algorithm="prim", data=False)
+edgelist = list(mst)
+sorted(sorted(e) for e in edgelist)
+
+Trees=nx.Graph()
+Trees.add_nodes_from(vertices)
+Trees.add_edges_from(edgelist)
+#print(edgelist)
+nx.draw(Trees,with_labels=True)
+plt.show()
