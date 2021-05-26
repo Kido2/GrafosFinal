@@ -156,8 +156,8 @@ def ponderacion(I1,I2,D):
 #M_n=M[:,5:]
 # Creacion del vector I+ y el vector I-
 # Area Relativa de cada zona,Vulnerabilidad de Cada Especie, Indice de dispersión, Cercania a cuerpos hidricos, Número de especies presente en cada zona
-fac_p=np.array([0.2,0.25,0.05,0.4,0.1])
-fac_n=np.array([0.3,0.4,0.3])
+fac_p=np.array([0.4,0.25,0.05,0.2,0.1])
+fac_n=np.array([0.25,0.4,0.35])
 #Ip=np.dot(M_p,fac_p)
 #In=np.dot(M_n,fac_n)
 
@@ -199,7 +199,7 @@ for i in range(len(ind_c2)):
 aristas.append(("v"+str(6),"v"+str(35),0.7))
 #print(aristas)
 Grafo.add_weighted_edges_from(aristas)
-mst = nx.tree.maximum_spanning_edges(Grafo, algorithm="prim", data=False)
+mst = nx.tree.maximum_spanning_edges(Grafo, algorithm="kruskal", data=False)
 edgelist = list(mst)
 sorted(sorted(e) for e in edgelist)
 
